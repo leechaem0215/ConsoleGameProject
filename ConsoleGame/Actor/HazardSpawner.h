@@ -3,22 +3,29 @@
 #include <Actor/Actor.h>
 #include <Util/Timer.h>
 
+#include <string>
+#include <vector>
+
+using namespace Craft;
+
 class HazardSpawner : public Craft::Actor
 {
 	TYPE_DECLARATIONS(HazardSpawner, Actor)
 
 public:
-	HazardSpawner();
+	explicit HazardSpawner(
+		const std::vector<std::wstring>& obstacleKeys
+	);
 
-private:
+	virtual ~HazardSpawner() = default;
+
 	virtual void Tick(float deltaTime) override;
 
+private:
 	void SpawnObstacle();
-	//void SpawnRandomHazard();
 
 private:
-	// 타이머
+	std::vector<std::wstring> obstacleKeys;
+
 	Timer timer;
 };
-
-

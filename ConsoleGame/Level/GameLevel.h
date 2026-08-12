@@ -4,6 +4,24 @@
 
 class GameLevel : public Craft::Level
 {
+	TYPE_DECLARATIONS(GameLevel, Level)
+
+public:
+	GameLevel(
+		const std::vector<std::wstring>& mapKeys,
+		const std::vector<std::wstring>& obstacleKeys,
+		const std::vector<std::wstring>& enemyKeys,
+		const std::vector<std::wstring>& playerKeys
+	);
+
+	virtual ~GameLevel() = default;
+
+private:
+	std::vector<std::wstring> mapKeys;
+	std::vector<std::wstring> obstacleKeys;
+	std::vector<std::wstring> enemyKeys;
+	std::vector<std::wstring> playerKeys;
+	
 private:
 	virtual void OnInitialized() override;
 

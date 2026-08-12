@@ -1,95 +1,155 @@
 ﻿#include "Background.h"
+
 #include <Engine/Engine.h>
 #include <Render/Renderer.h>
-#include <Math/Vector2.h>
-#include <Math/Color.h>
-#include <cstdio>
-#include <cstring>
-#include <cassert>
-#include <cmath>
+#include <Util/ResourceManager.h>
+#include <Util/Util.h>
 
-Background::Background()
+#include <algorithm>
+#include <stdexcept>
+
+using namespace Craft;
+
+Background::Background(
+	const std::vector<std::wstring>& mapKeys
+)
+	: mapKeys(mapKeys)
 {
-	// 배경은 가장 뒤에 그려지도록 낮은 정렬값 사용
-	// 프레임 초기값이 -1 이므로 이 값보다 작으면 그려지지 않음
-	// 따라서 배경은 -1로 설정하여 먼저 그려지도록 함
-	sortingOrder = -1;
-
-	// 파일 로드 (레벨에서 사용하는 Map.txt 를 배경으로 사용)
-	std::string path = std::string("../Assets/") + "Map.txt";
-
-	FILE* file = nullptr;
-	fopen_s(&file, path.c_str(), "rt");
-	if (!file) {
-		// 실행 폴더에도 시도
-		fopen_s(&file, "Map.txt", "rt");
-	}
-
-	if (!file) {
-		// 파일 없으면 아무것도 하지 않음
-		return;
-	}
-
-	const int bufferSize = 4096;
-	char* buffer = new char[bufferSize] {};
-	while (fgets(buffer, bufferSize, file))
+	if (this->mapKeys.empty())
 	{
-		size_t len = strlen(buffer);
-		while (len > 0 && (buffer[len - 1] == '\n' || buffer[len - 1] == '\r')) {
-			buffer[--len] = '\0';
-		}
-		lines.emplace_back(buffer);
+		throw std::runtime_error(
+			"Map 리소스 키가 없습니다."
+		);
 	}
-	delete[] buffer;
-	buffer = nullptr;
 
-	fclose(file);
-	file = nullptr;
+	sortingOrder = 0;
+
+	// 첫 번째 맵 추가
+	AddRandomMap();
+}
+
+void Background::AddRandomMap()
+{
+	const int randomIndex =
+		Util::RandomRange(
+			0,
+			static_cast<int>(mapKeys.size()) - 1
+		);
+
+	const std::wstring& selectedKey =
+		mapKeys[randomIndex];
+
+	const std::wstring& selectedImage =
+		ResourceManager::GetText(selectedKey);
+
+	/*
+	* ChangeImage()를 호출해서
+	* 해당 맵의 너비와 높이를 계산한다.
+	*
+	* Background 액터의 이미지는 계속 바뀌지만
+	* 실제 Draw에서는 mapPieces의 이미지를 사용한다.
+	*/
+	ChangeImage(selectedImage);
+
+	MapPiece newPiece;
+
+	newPiece.image = selectedImage;
+	newPiece.width = GetWidth();
+	newPiece.height = GetHeight();
+
+	if (mapPieces.empty())
+	{
+		// 첫 맵은 화면 오른쪽에서 시작
+		newPiece.xPosition =
+			static_cast<float>(
+				Engine::Get().GetWidth()
+				);
+	}
+	else
+	{
+		const MapPiece& lastPiece =
+			mapPieces.back();
+
+		const int randomGap =
+			Util::RandomRange(
+				minGap,
+				maxGap
+			);
+
+		// 이전 맵의 오른쪽 끝 + 랜덤 간격
+		newPiece.xPosition =
+			lastPiece.xPosition
+			+ lastPiece.width
+			+ randomGap;
+	}
+
+	mapPieces.push_back(newPiece);
 }
 
 void Background::Tick(float deltaTime)
 {
-	// 오른쪽 -> 왼쪽으로 이동하려면 scroll 값을 증가시킴
-	scroll += speed * deltaTime;
+	super::Tick(deltaTime);
+
+	// 모든 맵 조각 이동
+	for (MapPiece& piece : mapPieces)
+	{
+		piece.xPosition -= speed * deltaTime;
+	}
+
+	// 화면 왼쪽을 완전히 벗어난 맵 제거
+	mapPieces.erase(
+		std::remove_if(
+			mapPieces.begin(),
+			mapPieces.end(),
+			[](const MapPiece& piece)
+			{
+				return piece.xPosition
+					+ piece.width <= 0.0f;
+			}
+		),
+		mapPieces.end()
+	);
+
+	/*
+	* 가장 마지막 맵의 오른쪽 끝이
+	* 화면 안으로 들어오기 시작하면 다음 맵 추가
+	*/
+	if (mapPieces.empty())
+	{
+		AddRandomMap();
+	}
+	else
+	{
+		const MapPiece& lastPiece =
+			mapPieces.back();
+
+		const float lastRight =
+			lastPiece.xPosition
+			+ lastPiece.width;
+
+		if (lastRight <= Engine::Get().GetWidth())
+		{
+			AddRandomMap();
+		}
+	}
 }
 
 void Background::Draw()
 {
-	if (lines.empty())
+	for (const MapPiece& piece : mapPieces)
 	{
-		return;
-	}
+		const int mapY =
+			Engine::Get().GetHeight()
+			- piece.height;
 
-	// 화면 크기
-	int screenW = Craft::Engine::Get().GetWidth();
-	int screenH = Craft::Engine::Get().GetHeight();
-
-	// 각 라인을 화면에 제출
-	const int lineCount = static_cast<int>(lines.size());
-	for (int y = 0; y < lineCount && y < screenH; ++y)
-	{
-		const std::string& src = lines[y];
-		if (src.empty())
-		{
-			Craft::Renderer::Get().Submit(std::string(screenW, ' '), Craft::Vector2(0, y), Craft::Color::Cyan, sortingOrder);
-			continue;
-		}
-
-		int len = static_cast<int>(src.length());
-		if (len == 0)
-		{
-			continue;
-		}
-
-		// 반복 문자열을 만들어 충분히 긴 뷰를 뽑아냄
-		std::string extended = src;
-		while ((int)extended.length() < screenW + len) extended += src;
-
-		int start = static_cast<int>(floor(scroll)) % len;
-		if (start < 0) start += len;
-
-		std::string view = extended.substr(start, screenW);
-
-		Craft::Renderer::Get().Submit(view, Craft::Vector2(0, y), Craft::Color::White, sortingOrder);
+		Renderer::Get().Submit(
+			piece.image,
+			Vector2(
+				static_cast<int>(piece.xPosition),
+				mapY
+			),
+			Color::White,
+			sortingOrder
+		);
 	}
 }

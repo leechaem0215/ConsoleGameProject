@@ -3,9 +3,12 @@
 #include <Input/Input.h>
 
 using namespace Craft;
-Player::Player()
-	:Actor("⸜(๑'8'๑)⸝", Vector2::Zero, Color::Yellow)
+Player::Player(const std::vector<std::wstring>& playerKeys)
+	: Actor(ResourceManager::GetText(L"Player"),Vector2::Zero,Color::Yellow),
+	playerKeys(playerKeys)
 {
+	ChangePlayerFrame(0);
+
 	// 생성 위치 설정
 	// A 가 화면의 가운데 올 수 있도록 해줌
 	int x = -(Engine::Get().GetWidth() / 2);
@@ -27,53 +30,61 @@ Player::Player()
 void Player::Tick(float deltaTime)
 {
 	super::Tick(deltaTime);
-	if (Input::Get().GetKeyDown(VK_ESCAPE)) {
+
+	if (Input::Get().GetKeyDown(VK_ESCAPE))
+	{
 		QuitGame();
 	}
-	
+
 	float direction = 0.0f;
 
 	if (Input::Get().GetKey(VK_RIGHT))
 	{
 		direction = 1.0f;
 	}
+
 	if (Input::Get().GetKey(VK_LEFT))
 	{
 		direction = -1.0f;
 	}
-	Move(direction, deltaTime);
-
 
 	if (Input::Get().GetKeyDown(VK_UP))
 	{
 		Jump();
 	}
 
+	Move(direction, deltaTime);
 	UpdateJump(deltaTime);
+
+	UpdateMoveAnimation(
+		deltaTime,
+		direction
+	);
 }
 
 void Player::Move(float direction, float deltaTime) // Tick에서 호출할거임
 {
-	// x위치 업데이트
-	// 이동 처리 -> 이동 방향과 빠르기를 적용해서 새로운 위치를 구하는 것
-	// 이동 방향 (direction) / 빠르기(moveSpeed) | 시간
-	// 동속도 운동 : 이동 거리 = 기존의 위치 + 이동 방향 x 빠르기 x 시간 : 시간에 따른 이동량
-	// 빠르기는 항상 단위가 중요하다.
 	xPosition += direction * moveSpeed * deltaTime;
 
-	// 화면 제어
-	if (xPosition < 0) {
+	const int screenWidth = Engine::Get().GetWidth();
+	const int playerWidth = GetWidth();
+
+	const int maximumX =
+		(std::max)(0, screenWidth - playerWidth);
+
+	if (xPosition < 0.0f)
+	{
 		xPosition = 0.0f;
 	}
-	if (xPosition + width >= Engine::Get().GetWidth()) {
-		xPosition = static_cast<float>(Engine::Get().GetWidth() - width);
+
+	if (xPosition > static_cast<float>(maximumX))
+	{
+		xPosition = static_cast<float>(maximumX);
 	}
 
-	// 위치 업데이트
 	Vector2 newPosition = GetPosition();
-	// float 값을 int로 형변환할 때 소수점 값은 버림 처리된다는 점 주의
-	// 이거 고려해서 작성하는거
 	newPosition.x = static_cast<int>(xPosition);
+
 	SetPosition(newPosition);
 }
 
@@ -85,6 +96,7 @@ void Player::Jump()
 	}
 	isJumping = true;
 	yVelocity = -jumpPower;
+	ChangePlayerFrame(5);
 }
 
 void Player::UpdateJump(float deltaTime)
@@ -114,4 +126,94 @@ void Player::UpdateJump(float deltaTime)
 	newPosition.y = static_cast<int>(yPosition);
 
 	SetPosition(newPosition);
+}
+
+void Player::UpdateMoveAnimation(
+	float deltaTime,
+	float direction)
+{
+	// 점프 중에는 PlayerJ 이미지 유지
+	if (isJumping)
+	{
+		return;
+	}
+
+	// 좌우 키를 누르지 않은 경우
+	if (direction == 0.0f)
+	{
+		if (currentMoveFrame != 0)
+		{
+			ChangePlayerFrame(0);
+		}
+
+		moveAnimationTimer = 0.0f;
+		previousMoveDirection = 0.0f;
+
+		return;
+	}
+
+	// 이동을 막 시작했거나 방향을 바꾼 경우
+	if (previousMoveDirection != direction)
+	{
+		moveAnimationTimer = 0.0f;
+		previousMoveDirection = direction;
+
+		if (direction > 0.0f)
+		{
+			// 오른쪽 걷기 첫 프레임
+			ChangePlayerFrame(1);
+		}
+		else
+		{
+			// 왼쪽 걷기 첫 프레임
+			ChangePlayerFrame(3);
+		}
+
+		return;
+	}
+
+	moveAnimationTimer += deltaTime;
+
+	if (moveAnimationTimer < moveAnimationInterval)
+	{
+		return;
+	}
+
+	moveAnimationTimer -= moveAnimationInterval;
+
+	if (direction > 0.0f)
+	{
+		// 오른쪽: 1 ↔ 2
+		const int nextFrame =
+			(currentMoveFrame == 1) ? 2 : 1;
+
+		ChangePlayerFrame(nextFrame);
+	}
+	else
+	{
+		// 왼쪽: 3 ↔ 4
+		const int nextFrame =
+			(currentMoveFrame == 3) ? 4 : 3;
+
+		ChangePlayerFrame(nextFrame);
+	}
+}
+
+void Player::ChangePlayerFrame(int frameIndex)
+{
+	if (frameIndex < 0 ||
+		frameIndex >= static_cast<int>(playerKeys.size()))
+	{
+		return;
+	}
+
+	const std::wstring& selectedKey =
+		playerKeys[frameIndex];
+
+	const std::wstring& selectedImage =
+		ResourceManager::GetText(selectedKey);
+
+	ChangeImage(selectedImage);
+
+	currentMoveFrame = frameIndex;
 }

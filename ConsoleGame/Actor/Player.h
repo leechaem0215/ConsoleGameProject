@@ -2,14 +2,15 @@
 
 #include <Actor/Actor.h>
 #include <Util/Timer.h>
+#include <Util/ResourceManager.h>
 
 class Player : public Craft::Actor
 {
 	TYPE_DECLARATIONS(Player, Actor)
 
 public:
-	Player();
-
+	Player(const std::vector<std::wstring>& playerKeys);
+	~Player() = default;
 
 private:
 	virtual void Tick(float deltaTime) override;
@@ -19,7 +20,25 @@ private:
 	void Jump();
 	void UpdateJump(float deltaTime);
 
+	void UpdateMoveAnimation(
+		float deltaTime,
+		float direction
+	);
+
+	void ChangePlayerFrame(int frameIndex);
+	float previousMoveDirection = 0.0f;
+
 private:
+	std::vector<std::wstring> playerKeys;
+
+	int currentMoveFrame = 0;
+
+	float moveAnimationTimer = 0.0f;
+	float moveAnimationInterval = 0.15f;
+
+	bool wasMovingHorizontally = false;
+
+
 	float xPosition = 0.0f;
 	float yPosition = 0.0f;
 
@@ -34,7 +53,6 @@ private:
 	float jumpPower = 25.0f;
 	float gravity = 50.0f;
 	bool isJumping = false;
-	
 	
 	float fireInterval = 0.2f;
 	Timer timer;

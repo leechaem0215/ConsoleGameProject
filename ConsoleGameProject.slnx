@@ -3,6 +3,10 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Folder Name="/솔루션 항목/">
+    <File Path=".gitignore" />
+    <File Path="README.md" />
+  </Folder>
   <Project Path="../Unreal_Game_Track/ConsoleGameProject/CraftEngine/CraftEngine.vcxproj" Id="c93d6b4a-ce57-4761-b099-0349334ec87e">
     <Platform Project="x64" />
   </Project>

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Actor/Actor.h>
 #include <Util/Timer.h>
@@ -17,7 +17,7 @@ class Enemy : public Craft::Actor
 	};
 public:
 	// 생성자도 위치가 필요, 어떤 문자열을 보여줄지도
-	Enemy(const std::string& image = "(o0o)", int yPosition = 5);
+	Enemy(const std::wstring& image = L"(o0o)", int yPosition = 5);
 
 private:
 	// 이벤트 함수 오버라이드

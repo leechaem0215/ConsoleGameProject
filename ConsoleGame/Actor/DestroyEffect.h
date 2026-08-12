@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Actor/Actor.h>
 #include <Util/Timer.h>
@@ -13,7 +13,7 @@ public:
 	struct EffectFrame
 	{
 		EffectFrame(
-			const std::string& frame,
+			const std::wstring& frame,
 			float playTime = 0.05f,
 			Craft::Color color = Craft::Color::Red)
 			: frame(frame), playTime(playTime), color(color)
@@ -23,7 +23,7 @@ public:
 		~EffectFrame() = default;
 
 		// 문자열 변수 (화면에 보여줄 문자열).
-		std::string frame;
+		std::wstring frame;
 
 		// 재생 시간.
 		float playTime = 0.0f;

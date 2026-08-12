@@ -7,20 +7,40 @@
 #include <string>
 #include <cassert>
 #include <Actor/Background.h>
-#include <Actor/Obstacle.h>
+#include <Actor/Hazard/Obstacle.h>
+#include <Actor/HazardSpawner.h>
 #include <cstdlib>
 #include <ctime>
+
+
+using namespace Craft;
+
+GameLevel::GameLevel(
+	const std::vector<std::wstring>& mapKeys,
+	const std::vector<std::wstring>& obstacleKeys,
+	const std::vector<std::wstring>& enemyKeys,
+	const std::vector<std::wstring>& playerKeys)
+	: mapKeys(mapKeys),
+	obstacleKeys(obstacleKeys),
+	enemyKeys(enemyKeys),
+	playerKeys(playerKeys)
+{
+}
 
 void GameLevel::OnInitialized()
 {
 	Level::OnInitialized();
 
-	SpawnActor<Background>();
+	SpawnActor<Background>(mapKeys);
+
+	SpawnActor<HazardSpawner>(obstacleKeys);
+
+
 
 	// 난수 시드 초기화
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-	SpawnActor<Player>();
+	SpawnActor<Player>(playerKeys);
 }
 
 void GameLevel::Tick(float deltaTime)
@@ -51,7 +71,8 @@ void GameLevel::SpawnRandomObstacle()
 	// 속도 약간 랜덤화 (10 ~ 25)
 	float speed = 10.0f + static_cast<float>(std::rand() % 16);
 
-	SpawnActor<Obstacle>(pos, speed);
+	//SpawnActor<Obstacle>(pos, speed);
+	SpawnActor<HazardSpawner>(enemyKeys);
 }
 
 void GameLevel::ResetObstacleTimer()

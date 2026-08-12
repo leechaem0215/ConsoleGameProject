@@ -1,4 +1,4 @@
-#include "Enemy.h"
+﻿#include "Enemy.h"
 #include <Util/Util.h>// 랜덤 얻어옴
 #include <Engine/Engine.h>
 #include <Level/Level.h>
@@ -6,11 +6,11 @@
 #include <Actor/DestroyEffect.h>
 
 using namespace Craft;
-Enemy::Enemy(const std::string& image, int yPosition)
+Enemy::Enemy(const std::wstring& image, int yPosition)
 	:Actor(image)
 {
 	direction = MoveDirection::Left;
-	xPosition = static_cast<float>(Engine::Get().GetWidth() - width - 1);
+	xPosition = static_cast<float>(Engine::Get().GetWidth() - 1);
 
 	// 위치 설정
 	SetPosition(Vector2(static_cast<int>(xPosition), yPosition));
@@ -22,10 +22,12 @@ void Enemy::Tick(float deltaTime)
 
 	// 이동
 	float dir = direction == MoveDirection::Left ? -1.0f : 1.0f;
-	xPosition += dir * moveSpeed * deltaTime;
+	xPosition = static_cast<float>(
+		Engine::Get().GetWidth()
+	);
 
 	// 화면에 벗어나면 안됌 -> 좌표검사
-	if (xPosition + width < 0) // 위치기준 오른쪽, 완전히 벗어나면 
+	if (xPosition + GetWidth() < 0) // 위치기준 오른쪽, 완전히 벗어나면 
 	{
 		Destroy(); // 왼쪽으로 벗어나는 경우
 		return;

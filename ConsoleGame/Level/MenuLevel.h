@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Level/Level.h>
 #include <string>
@@ -11,13 +11,13 @@ struct MenuItem
 	using OnSelected = void(*)();
 
 	// 생성자
-	MenuItem(const std::string& text, OnSelected onSelected)
+	MenuItem(const std::wstring& text, OnSelected onSelected)
 		:text(text), onSelected(onSelected)
 	{
 	}
 
 	// 메뉴 텍스트
-	std::string text;
+	std::wstring text;
 
 	// 메뉴를 선택했을 때 실행할 로직
 	OnSelected onSelected = nullptr;
@@ -46,4 +46,3 @@ private:
 	// 메뉴 아이템 배열
 	std::vector<std::unique_ptr<MenuItem>> itemList;
 };
-

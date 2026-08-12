@@ -1,8 +1,8 @@
 ﻿#include "Obstacle.h"
 
 using namespace Craft;
-Obstacle::Obstacle(const Vector2& position, float moveSpeed)
-	:Actor("ㅁ", position, Color::BrightWhite), xPosition(position.x), moveSpeed(moveSpeed)
+Obstacle::Obstacle(const std::wstring& image, float moveSpeed)
+	:Actor(image)
 {
 	sortingOrder = 10;
 }

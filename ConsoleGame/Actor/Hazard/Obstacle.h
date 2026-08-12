@@ -7,8 +7,8 @@ class Obstacle : public Craft::Actor
 	TYPE_DECLARATIONS(Obstacle, Actor)
 
 public:
-	Obstacle(const Craft::Vector2& position,float moveSpeed);
-
+	Obstacle(const std::wstring& image,float moveSpeed);
+	virtual ~Obstacle() = default;
 private:
 	virtual void Tick(float deltaTime) override;
 

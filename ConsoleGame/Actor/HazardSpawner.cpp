@@ -4,23 +4,17 @@
 #include <Actor/Hazard/Obstacle.h>
 #include <Level/Level.h>
 #include <Engine/Engine.h>
+#include <Util/ResourceManager.h>
 
 using namespace Craft;
 
-// 생성할 장애물 이미지 타입 배열
-static std::string obstacleType[] =
+HazardSpawner::HazardSpawner(
+	const std::vector<std::wstring>& obstacleKeys)
+	: obstacleKeys(obstacleKeys)
 {
-	"###",
-	"***",
-	"@@@",
-	"<-=->",
-	")qOp(",
-};
-
-HazardSpawner::HazardSpawner()
-{
-	// 장애물 생성 타이머 설정
-	timer.SetTargetTime(Util::RandomRange(0.5f, 0.8f));
+	timer.SetTargetTime(
+		Util::RandomRange(0.5f, 0.8f)
+	);
 }
 
 void HazardSpawner::Tick(float deltaTime)
@@ -45,18 +39,33 @@ void HazardSpawner::Tick(float deltaTime)
 
 void HazardSpawner::SpawnObstacle()
 {
-	// 장애물 생성 처리
+	if (obstacleKeys.empty())
+	{
+		return;
+	}
 
-	// 장애물 이미지 배열의 길이 확인
-	const int length = sizeof(obstacleType) / sizeof(obstacleType[0]);
+	const int randomIndex =
+		Util::RandomRange(
+			0,
+			static_cast<int>(obstacleKeys.size()) - 1
+		);
 
-	// 랜덤 인덱스
-	const int index = Util::RandomRange(0, length - 1);
-	const int yPosition = Craft::Engine::Get().GetHeight() - 5;
+	const std::wstring& selectedKey =
+		obstacleKeys[randomIndex];
+
+	const std::wstring& selectedImage =
+		ResourceManager::GetText(selectedKey);
+
+	const int yPosition =
+		Engine::Get().GetHeight() - 5;
 
 	std::shared_ptr<Level> owner = GetOwner();
-	if (owner) // 레벨에 거쳐서 랜덤 생성하고 ..
+
+	if (owner)
 	{
-		owner->SpawnActor<Obstacle>(obstacleType[index], yPosition);
+		owner->SpawnActor<Obstacle>(
+			selectedImage,
+			yPosition
+		);
 	}
 }

@@ -1,8 +1,8 @@
-#include "PlayerBullet.h"
+﻿#include "PlayerBullet.h"
 
 using namespace Craft;
 PlayerBullet::PlayerBullet(const Vector2& position)
-	:Actor("-", position, Color::Blue), //position 전달받은 위치값 사용
+	:Actor(L"-", position, Color::Blue), //position 전달받은 위치값 사용
 	yPosition(static_cast<float>(position.y)) // 멤버변수 초기화 까지 개준거임
 {
 }
