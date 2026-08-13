@@ -12,6 +12,23 @@ public:
 	Player(const std::vector<std::wstring>& playerKeys);
 	~Player() = default;
 
+public:
+	float GetVerticalVelocity() const
+	{
+		return yVelocity;
+	}
+
+	int GetPreviousBottom() const
+	{
+		return previousPosition.y + GetHeight();
+	}
+
+	void LandOn(int platformTop);
+
+	void TakeDamage(int damage);
+	int GetHp() const;
+	int GetMaxHp() const;
+
 private:
 	virtual void Tick(float deltaTime) override;
 
@@ -28,10 +45,13 @@ private:
 	void ChangePlayerFrame(int frameIndex);
 	float previousMoveDirection = 0.0f;
 
+	void Fire();
 private:
 	std::vector<std::wstring> playerKeys;
 
 	int currentMoveFrame = 0;
+	int hp = 3;
+	int maxHp = 3;
 
 	float moveAnimationTimer = 0.0f;
 	float moveAnimationInterval = 0.15f;

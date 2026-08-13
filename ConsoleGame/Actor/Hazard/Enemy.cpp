@@ -2,12 +2,12 @@
 #include <Util/Util.h>// 랜덤 얻어옴
 #include <Engine/Engine.h>
 #include <Level/Level.h>
-#include <Actor/PlayerBullet.h>
+#include <Actor/Player/PlayerBullet.h>
 #include <Actor/DestroyEffect.h>
 
 using namespace Craft;
 Enemy::Enemy(const std::wstring& image, int yPosition)
-	:Actor(image)
+	:Actor(image,Vector2(Engine::Get().GetWidth(),yPosition),Color::Red)
 {
 	direction = MoveDirection::Left;
 	xPosition = static_cast<float>(Engine::Get().GetWidth() - 1);

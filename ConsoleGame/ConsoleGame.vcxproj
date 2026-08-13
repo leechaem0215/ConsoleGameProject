@@ -154,27 +154,36 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actor\Background.cpp" />
+    <ClCompile Include="Actor\Boundary.cpp" />
     <ClCompile Include="Actor\DestroyEffect.cpp" />
     <ClCompile Include="Actor\Hazard\Enemy.cpp" />
     <ClCompile Include="Actor\Ground.cpp" />
     <ClCompile Include="Actor\Hazard\Obstacle.cpp" />
-    <ClCompile Include="Actor\Player.cpp" />
-    <ClCompile Include="Actor\PlayerBullet.cpp" />
+    <ClCompile Include="Actor\Player\Player.cpp" />
+    <ClCompile Include="Actor\Player\PlayerBullet.cpp" />
+    <ClCompile Include="Actor\Hazard\Hazard.cpp" />
+    <ClCompile Include="Actor\Player\PlayerHealth.cpp" />
     <ClCompile Include="Level\GameLevel.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Actor\HazardSpawner.cpp" />
+    <ClCompile Include="Actor\Spawner\HazardSpawner.cpp" />
+    <ClCompile Include="Actor\Platform.cpp" />
     <ClCompile Include="Util\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\Background.h" />
+    <ClInclude Include="Actor\Boundary.h" />
     <ClInclude Include="Actor\DestroyEffect.h" />
     <ClInclude Include="Actor\Hazard\Enemy.h" />
     <ClInclude Include="Actor\Ground.h" />
     <ClInclude Include="Actor\Hazard\Obstacle.h" />
-    <ClInclude Include="Actor\Player.h" />
-    <ClInclude Include="Actor\PlayerBullet.h" />
+    <ClInclude Include="Actor\Player\Player.h" />
+    <ClInclude Include="Actor\Player\PlayerBullet.h" />
+    <ClInclude Include="Actor\Hazard\Hazard.h" />
+    <ClInclude Include="Actor\Player\PlayerHealth.h" />
+    <ClInclude Include="Resource\GameResources.h" />
     <ClInclude Include="Level\GameLevel.h" />
-    <ClInclude Include="Actor\HazardSpawner.h" />
+    <ClInclude Include="Actor\Spawner\HazardSpawner.h" />
+    <ClInclude Include="Actor\Platform.h" />
     <ClInclude Include="Util\Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

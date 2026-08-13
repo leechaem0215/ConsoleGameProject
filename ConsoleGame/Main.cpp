@@ -1,6 +1,7 @@
 ﻿#include <Engine/Engine.h>
 #include <Level/GameLevel.h>
 #include <Util/ResourceManager.h>
+#include <Resource/GameResources.h>
 #include <vector>
 #include <string>
 
@@ -9,8 +10,9 @@ using namespace Craft;
 int main() {
 	// 창 제목 설정
 	SetConsoleTitleA("RUN Game");
+	GameResources resources;
 
-	const std::vector<std::wstring> mapKeys =
+	resources.mapKeys =
 		ResourceManager::LoadAll({
 			{
 				L"Map",
@@ -30,7 +32,7 @@ int main() {
 			}
 			});
 
-	const std::vector<std::wstring> obstacleKeys =
+	resources.hazard.obstacleKeys =
 		ResourceManager::LoadAll({
 			{
 				L"Obstacle",
@@ -39,22 +41,50 @@ int main() {
 			{
 				L"Obstacle2",
 				L"../Assets/Sprites/Obstacle2.txt"
-			}
-			});
-
-	const std::vector<std::wstring> enemyKeys =
-		ResourceManager::LoadAll({
-			{
-				L"Enemy",
-				L"../Assets/Sprites/Enemy.txt"
 			},
 			{
-				L"Enemy2",
-				L"../Assets/Sprites/Enemy2.txt"
+				L"Obstacle3",
+				L"../Assets/Sprites/Obstacle3.txt"
 			}
 			});
 
-	const std::vector<std::wstring> playerKeys =
+	resources.hazard.ceilingKeys =
+		ResourceManager::LoadAll({
+			{
+				L"Ceiling_G1",
+				L"../Assets/Sprites/Ceiling_G1.txt"
+			},
+			{
+				L"Ceiling_G2",
+				L"../Assets/Sprites/Ceiling_G2.txt"
+			},
+			{
+				L"Ceiling_G3",
+				L"../Assets/Sprites/Ceiling_G3.txt"
+			}
+			});
+
+	resources.hazard.enemyKeys =
+		ResourceManager::LoadAll({
+			{
+				L"Enemy_S1",
+				L"../Assets/Sprites/Enemy_S1.txt"
+			},
+			{
+				L"Enemy_S2",
+				L"../Assets/Sprites/Enemy_S2.txt"
+			},
+			{
+				L"Enemy_U1",
+				L"../Assets/Sprites/Enemy_U1.txt"
+			},
+			{
+				L"Enemy_U2",
+				L"../Assets/Sprites/Enemy_U2.txt"
+			}
+			});
+
+	resources.playerKeys =
 	ResourceManager::LoadAll({
 		{
 			L"Player",
@@ -79,19 +109,30 @@ int main() {
 		{
 			L"PlayerJ",
 			L"../Assets/Sprites/PlayerJ.txt"
-		}
+		},
+		{
+			L"PlayerD",
+			L"../Assets/Sprites/PlayerD.txt"
+		},
 	});
+
+	resources.effectKeys =
+		ResourceManager::LoadAll({
+			{
+				L"Effect_t1",
+				L"../Assets/Effect/Effect_t1.txt"
+			},
+			{
+				L"Effect_t2",
+				L"../Assets/Effect/Effect_t2.txt"
+			}
+			});
 
 	Craft::Engine engine;
 
 	// 엔진이 사용할 GameLevel을 생성하면서
 	// 리소스 키 목록도 함께 전달
-	engine.AddNewLevel<GameLevel>(
-		mapKeys,
-		obstacleKeys,
-		enemyKeys,
-		playerKeys
-	);
+	engine.AddNewLevel<GameLevel>(resources);
 
 	engine.Run();
 }

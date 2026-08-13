@@ -1,27 +1,17 @@
 ﻿#pragma once
 
 #include <Level/Level.h>
+#include "Resource/GameResources.h"
 
 class GameLevel : public Craft::Level
 {
 	TYPE_DECLARATIONS(GameLevel, Level)
 
 public:
-	GameLevel(
-		const std::vector<std::wstring>& mapKeys,
-		const std::vector<std::wstring>& obstacleKeys,
-		const std::vector<std::wstring>& enemyKeys,
-		const std::vector<std::wstring>& playerKeys
-	);
-
+	GameLevel(const GameResources& resources);
 	virtual ~GameLevel() = default;
 
-private:
-	std::vector<std::wstring> mapKeys;
-	std::vector<std::wstring> obstacleKeys;
-	std::vector<std::wstring> enemyKeys;
-	std::vector<std::wstring> playerKeys;
-	
+
 private:
 	virtual void OnInitialized() override;
 
@@ -37,5 +27,7 @@ private:
 
 	float minSpawnTime = 1.5f;
 	float maxSpawnTime = 3.5f;
+
+	GameResources resources;
 };
 

@@ -1,6 +1,7 @@
 ﻿#include "Player.h"
 #include <Engine/Engine.h>
 #include <Input/Input.h>
+#include <Actor/Player/PlayerBullet.h> 
 
 using namespace Craft;
 Player::Player(const std::vector<std::wstring>& playerKeys)
@@ -25,11 +26,15 @@ Player::Player(const std::vector<std::wstring>& playerKeys)
 
 	// 연사 타이머 시간 설정
 	timer.SetTargetTime(fireInterval);
+
+	sortingOrder = 10;
 }
 
 void Player::Tick(float deltaTime)
 {
 	super::Tick(deltaTime);
+	previousPosition = GetPosition();
+
 
 	if (Input::Get().GetKeyDown(VK_ESCAPE))
 	{
@@ -60,6 +65,12 @@ void Player::Tick(float deltaTime)
 		deltaTime,
 		direction
 	);
+
+	// 탄약 발사 로직
+	if (Input::Get().GetKeyDown(VK_SPACE))
+	{
+		Fire();
+	}
 }
 
 void Player::Move(float direction, float deltaTime) // Tick에서 호출할거임
@@ -72,14 +83,14 @@ void Player::Move(float direction, float deltaTime) // Tick에서 호출할거�
 	const int maximumX =
 		(std::max)(0, screenWidth - playerWidth);
 
-	if (xPosition < 0.0f)
+	if (xPosition < 0)
 	{
 		xPosition = 0.0f;
 	}
 
-	if (xPosition > static_cast<float>(maximumX))
+	if (xPosition >= screenWidth)
 	{
-		xPosition = static_cast<float>(maximumX);
+		xPosition = static_cast<float>(Engine::Get().GetWidth() - playerWidth);
 	}
 
 	Vector2 newPosition = GetPosition();
@@ -216,4 +227,51 @@ void Player::ChangePlayerFrame(int frameIndex)
 	ChangeImage(selectedImage);
 
 	currentMoveFrame = frameIndex;
+}
+
+void Player::TakeDamage(int damage)
+{
+	hp -= damage;
+
+	if (hp <= 0)
+	{
+		QuitGame();
+	}
+}
+
+int Player::GetHp() const
+{
+	return hp;
+}
+
+int Player::GetMaxHp() const
+{
+	return maxHp;
+}
+
+
+void Player::Fire()
+{
+	// 탄약 생성 위치 구하기
+	// 플레이어의 가운데 위치
+	// <=A=>   < 위치 x에서 2칸 이동하면 A 위치가 됨.
+	//   ^   탄약이 제대로 가리키려면 해당 위치여야한다.
+	Vector2 bulletPosition(GetPosition().x + (GetWidth() / 2), GetPosition().y);
+
+	// 탄약 생성
+	std::shared_ptr<Level> owner = GetOwner();
+	if (owner) {
+		//owner->SpawnActor<PlayerBullet>(bulletPosition);
+	}
+}
+void Player::LandOn(int platformTop)
+{
+	Vector2 position = GetPosition();
+
+	position.y = platformTop - GetHeight();
+
+	SetPosition(position);
+
+	yVelocity = 0.0f;
+	isJumping = false;
 }

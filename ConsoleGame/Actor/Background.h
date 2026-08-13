@@ -45,5 +45,5 @@ private:
 	int minGap = 3;
 	int maxGap = 20;
 
-	int sortingOrder = 0;
+	int sortingOrder = 2;
 };

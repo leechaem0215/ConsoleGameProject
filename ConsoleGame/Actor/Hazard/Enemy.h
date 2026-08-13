@@ -8,8 +8,8 @@ class Enemy : public Craft::Actor
 	// 커스텀 타입 설정
 	TYPE_DECLARATIONS(Enemy, Actor)
 
-		// 이동할 때 쓸 열거형 지정
-		enum class MoveDirection
+	// 이동할 때 쓸 열거형 지정
+	enum class MoveDirection
 	{
 		None = -1,
 		Left,
@@ -17,7 +17,7 @@ class Enemy : public Craft::Actor
 	};
 public:
 	// 생성자도 위치가 필요, 어떤 문자열을 보여줄지도
-	Enemy(const std::wstring& image = L"(o0o)", int yPosition = 5);
+	Enemy(const std::wstring& image, int yPosition);
 
 private:
 	// 이벤트 함수 오버라이드

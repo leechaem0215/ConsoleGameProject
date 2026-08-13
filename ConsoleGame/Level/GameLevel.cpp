@@ -1,5 +1,6 @@
 ﻿#include "GameLevel.h"
-#include <Actor/Player.h>
+#include <Actor/Player/Player.h>
+#include <Actor/Player/PlayerHealth.h>
 #include <Render/Renderer.h>
 #include <Engine/Engine.h>
 #include <cstdio>
@@ -7,40 +8,39 @@
 #include <string>
 #include <cassert>
 #include <Actor/Background.h>
+#include <Actor/Boundary.h>
 #include <Actor/Hazard/Obstacle.h>
-#include <Actor/HazardSpawner.h>
+#include <Actor/Spawner/HazardSpawner.h>
 #include <cstdlib>
 #include <ctime>
 
 
 using namespace Craft;
 
-GameLevel::GameLevel(
-	const std::vector<std::wstring>& mapKeys,
-	const std::vector<std::wstring>& obstacleKeys,
-	const std::vector<std::wstring>& enemyKeys,
-	const std::vector<std::wstring>& playerKeys)
-	: mapKeys(mapKeys),
-	obstacleKeys(obstacleKeys),
-	enemyKeys(enemyKeys),
-	playerKeys(playerKeys)
+GameLevel::GameLevel(const GameResources& resources)
+	: resources(resources)
 {
 }
-
 void GameLevel::OnInitialized()
 {
 	Level::OnInitialized();
 
-	SpawnActor<Background>(mapKeys);
-
-	SpawnActor<HazardSpawner>(obstacleKeys);
-
-
-
 	// 난수 시드 초기화
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-	SpawnActor<Player>(playerKeys);
+	SpawnActor<Boundary>(
+		Vector2(5, 5),
+		Engine::Get().GetWidth(),
+		Engine::Get().GetHeight()
+	);
+
+	SpawnActor<Background>(resources.mapKeys);
+
+	SpawnActor<HazardSpawner>(resources.hazard);
+
+	std::shared_ptr<Player> player =SpawnActor<Player>(resources.playerKeys);
+
+	SpawnActor<PlayerHealth>(player);
 }
 
 void GameLevel::Tick(float deltaTime)
@@ -72,7 +72,7 @@ void GameLevel::SpawnRandomObstacle()
 	float speed = 10.0f + static_cast<float>(std::rand() % 16);
 
 	//SpawnActor<Obstacle>(pos, speed);
-	SpawnActor<HazardSpawner>(enemyKeys);
+	SpawnActor<HazardSpawner>(resources.hazard);
 }
 
 void GameLevel::ResetObstacleTimer()
