@@ -45,10 +45,14 @@ private:
 	void ChangePlayerFrame(int frameIndex);
 	float previousMoveDirection = 0.0f;
 
+	void StartCrouch();
+	void EndCrouch();
+
 	void Fire();
 private:
 	std::vector<std::wstring> playerKeys;
 
+	bool isCrouching = false;
 	int currentMoveFrame = 0;
 	int hp = 3;
 	int maxHp = 3;
@@ -71,7 +75,7 @@ private:
 	/* Y축 속도 + 중력 + 착지 판정 */
 	float yVelocity = 0.0f;
 	float jumpPower = 25.0f;
-	float gravity = 50.0f;
+	float gravity = 100.0f;
 	bool isJumping = false;
 	
 	float fireInterval = 0.2f;

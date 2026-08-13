@@ -27,5 +27,5 @@ private:
     float spawnTimer = 0.0f;
 
     int groundY = 0;
-    int ceilingY = 2;
+    int ceilingY = 1;
 };

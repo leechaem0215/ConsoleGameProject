@@ -22,7 +22,7 @@ Background::Background(
 		);
 	}
 
-	sortingOrder = 0;
+	sortingOrder = 5;
 
 	// 첫 번째 맵 추가
 	AddRandomMap();

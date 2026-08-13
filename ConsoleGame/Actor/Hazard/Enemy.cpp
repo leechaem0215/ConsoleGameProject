@@ -3,7 +3,6 @@
 #include <Engine/Engine.h>
 #include <Level/Level.h>
 #include <Actor/Player/PlayerBullet.h>
-#include <Actor/DestroyEffect.h>
 
 using namespace Craft;
 Enemy::Enemy(const std::wstring& image, int yPosition)
@@ -45,26 +44,4 @@ void Enemy::Tick(float deltaTime)
 	}
 	// 발사 가능하다면 타이머 리셋
 	timer.Reset();
-}
-
-void Enemy::OnCollision(const std::shared_ptr<Actor>& other) // other 가 플레이어 탄약이면 사라지도록 할것임
-{
-	super::OnCollision(other);
-
-	// 충돌한 다른 액터가 플레이어 탄약이면 삭제
-	// 커스텀 타입 활용
-	if (other->IsTypeOf<PlayerBullet>()) // 매크로가 잘 지정되어 있어야함.
-	{
-		// 플레이어 탄약 제거
-		other->Destroy();
-
-		// 적 액터 제거
-		Destroy();
-
-		// 적 파괴 이펙트 생성
-		if (GetOwner())
-		{
-			GetOwner()->SpawnActor<DestroyEffect>(GetPosition());
-		}
-	}
 }

@@ -1,4 +1,5 @@
 ﻿#include "Player.h"
+#include "Level/GameLayout.h"
 #include <Engine/Engine.h>
 #include <Input/Input.h>
 #include <Actor/Player/PlayerBullet.h> 
@@ -10,21 +11,19 @@ Player::Player(const std::vector<std::wstring>& playerKeys)
 {
 	ChangePlayerFrame(0);
 
-	// 생성 위치 설정
-	// A 가 화면의 가운데 올 수 있도록 해줌
-	int x = -(Engine::Get().GetWidth() / 2);
-	int y = (Engine::Get().GetHeight() - 5);
+	const int screenWidth = Engine::Get().GetWidth();
+	const int screenHeight = Engine::Get().GetHeight();
+
+	const int x = (screenWidth - GetWidth()) / 2;
+	const int y = GameLayout::GetDividerY(screenHeight) - GetHeight();
+
 	SetPosition(Vector2(x, y));
 
-	// x위치 저장
 	xPosition = static_cast<float>(x);
-	// y위치 저장
 	yPosition = static_cast<float>(y);
 
-	// groundY 초기화 (이 위치를 바닥으로 사용)
-	groundY = static_cast<float>(Engine::Get().GetHeight() - 5);
+	groundY = static_cast<float>(y);
 
-	// 연사 타이머 시간 설정
 	timer.SetTargetTime(fireInterval);
 
 	sortingOrder = 10;
@@ -41,21 +40,34 @@ void Player::Tick(float deltaTime)
 		QuitGame();
 	}
 
+	// 아래 방향키를 누르는 동안 엎드림
+	if (Input::Get().GetKey(VK_DOWN))
+	{
+		StartCrouch();
+	}
+	else
+	{
+		EndCrouch();
+	}
+
 	float direction = 0.0f;
 
-	if (Input::Get().GetKey(VK_RIGHT))
+	if (!isCrouching)
 	{
-		direction = 1.0f;
-	}
+		if (Input::Get().GetKey(VK_RIGHT))
+		{
+			direction = 1.0f;
+		}
 
-	if (Input::Get().GetKey(VK_LEFT))
-	{
-		direction = -1.0f;
-	}
+		if (Input::Get().GetKey(VK_LEFT))
+		{
+			direction = -1.0f;
+		}
 
-	if (Input::Get().GetKeyDown(VK_UP))
-	{
-		Jump();
+		if (Input::Get().GetKeyDown(VK_UP))
+		{
+			Jump();
+		}
 	}
 
 	Move(direction, deltaTime);
@@ -148,6 +160,10 @@ void Player::UpdateMoveAnimation(
 	{
 		return;
 	}
+	if (!isCrouching)
+	{
+		return;
+	}
 
 	// 좌우 키를 누르지 않은 경우
 	if (direction == 0.0f)
@@ -218,15 +234,73 @@ void Player::ChangePlayerFrame(int frameIndex)
 		return;
 	}
 
-	const std::wstring& selectedKey =
-		playerKeys[frameIndex];
+	const std::wstring& selectedKey =playerKeys[frameIndex];
 
-	const std::wstring& selectedImage =
-		ResourceManager::GetText(selectedKey);
+	const std::wstring& selectedImage = ResourceManager::GetText(selectedKey);
 
 	ChangeImage(selectedImage);
 
 	currentMoveFrame = frameIndex;
+}
+
+void Player::StartCrouch()
+{
+	// 점프 중에는 엎드리지 않음
+	if (isJumping)
+	{
+		return;
+	}
+
+	// 이미 엎드린 상태면 다시 처리하지 않음
+	if (isCrouching)
+	{
+		return;
+	}
+
+	isCrouching = true;
+
+	ChangePlayerFrame(6);
+
+	// 이미지 높이가 바뀌었으므로
+	// 발이 기존 바닥에 맞도록 위치를 다시 계산
+	const int dividerY =GameLayout::GetDividerY(Engine::Get().GetHeight());
+
+	const int crouchY = dividerY - GetHeight();
+
+	yPosition = static_cast<float>(crouchY);
+
+	Vector2 position = GetPosition();
+
+	position.y = crouchY;
+
+	SetPosition(position);
+}
+
+void Player::EndCrouch()
+{
+	if (!isCrouching)
+	{
+		return;
+	}
+
+	isCrouching = false;
+
+	// 기본 서 있는 이미지로 복귀
+	ChangePlayerFrame(0);
+
+	const int dividerY =GameLayout::GetDividerY(Engine::Get().GetHeight());
+
+	const int standingY = dividerY - GetHeight();
+
+	yPosition = static_cast<float>(standingY);
+
+	groundY = static_cast<float>(standingY);
+
+	Vector2 position = GetPosition();
+
+	position.y = standingY;
+
+	SetPosition(position);
 }
 
 void Player::TakeDamage(int damage)

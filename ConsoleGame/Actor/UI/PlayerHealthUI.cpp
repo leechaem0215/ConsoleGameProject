@@ -1,19 +1,22 @@
-﻿#include "PlayerHealth.h"
+﻿#include "PlayerHealthUI.h"
+#include "Level/GameLayout.h"
 #include <Actor/Player/Player.h>
-
+#include <Engine/Engine.h>
 #include <string>
 
 using namespace Craft;
 
-PlayerHealth::PlayerHealth(const std::shared_ptr<Player>& player)
-	:Actor(L"", Vector2(7,6), Color::Red),
+PlayerHealthUI::PlayerHealthUI(const std::shared_ptr<Player>& player)
+	:Actor(L"", Vector2::Zero, Color::Red),
 	player(player)
 {
+    const int statusY = GameLayout::GetUIStartY(Engine::Get().GetHeight());
+    SetPosition(Vector2(2,statusY));
 	sortingOrder = 100;
 	UpdateHeartImage();
 }
 
-void PlayerHealth::Tick(float deltaTime)
+void PlayerHealthUI::Tick(float deltaTime)
 {
     super::Tick(deltaTime);
 
@@ -33,10 +36,9 @@ void PlayerHealth::Tick(float deltaTime)
     UpdateHeartImage();
 }
 
-void PlayerHealth::UpdateHeartImage()
+void PlayerHealthUI::UpdateHeartImage()
 {
-    std::shared_ptr<Player> currentPlayer =
-        player.lock();
+    std::shared_ptr<Player> currentPlayer = player.lock();
 
     if (currentPlayer == nullptr)
     {

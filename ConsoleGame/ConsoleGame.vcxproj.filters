@@ -30,19 +30,10 @@
     <ClCompile Include="Actor\Background.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\Ground.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Actor\Hazard\Enemy.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Actor\Player\PlayerBullet.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Actor\DestroyEffect.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Actor\Hazard\Obstacle.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Actor\Spawner\HazardSpawner.cpp">
@@ -57,7 +48,7 @@
     <ClCompile Include="Actor\Platform.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\Player\PlayerHealth.cpp">
+    <ClCompile Include="Actor\UI\PlayerHealthUI.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,19 +65,10 @@
     <ClInclude Include="Actor\Background.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\Ground.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Actor\Hazard\Enemy.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Actor\Player\PlayerBullet.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor\DestroyEffect.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor\Hazard\Obstacle.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Actor\Spawner\HazardSpawner.h">
@@ -104,7 +86,10 @@
     <ClInclude Include="Resource\GameResources.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\Player\PlayerHealth.h">
+    <ClInclude Include="Actor\UI\PlayerHealthUI.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\GameLayout.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

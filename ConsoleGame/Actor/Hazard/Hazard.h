@@ -16,17 +16,11 @@ class Hazard : public Craft::Actor
     TYPE_DECLARATIONS(Hazard, Actor)
 
 public:
-    Hazard(
-        const std::wstring& imageKey,
-        const Craft::Vector2& position,
-        HazardType type
-    );
+    Hazard(const std::wstring& imageKey,int groundY, HazardType type);
 
     virtual ~Hazard() = default;
 
-    virtual void OnCollision(
-        const std::shared_ptr<Craft::Actor>& other
-    ) override;
+    virtual void OnCollision( const std::shared_ptr<Craft::Actor>& other) override;
 
 private:
     virtual void Tick(float deltaTime) override;
