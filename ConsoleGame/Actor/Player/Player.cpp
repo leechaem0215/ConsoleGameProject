@@ -88,6 +88,32 @@ void Player::Tick(float deltaTime)
 	{
 		Fire();
 	}
+
+	if (isInvincible)
+	{
+		invincibleTimer += deltaTime;
+		blinkTimer += deltaTime;
+
+		// 일정 간격마다 표시 상태 전환
+		if (blinkTimer >= blinkInterval)
+		{
+			blinkTimer = 0.0f;
+			SetVisible(!isVisible);
+		}
+
+		// 무적 시간 종료
+		if (invincibleTimer >= invincibleDuration)
+		{
+			isInvincible = false;
+
+			invincibleTimer = 0.0f;
+			blinkTimer = 0.0f;
+
+			// 안 보이는 상태로 끝나지 않도록 복구
+			isVisible = true;
+			SetVisible(true);
+		}
+	}
 }
 
 void Player::Move(float direction, float deltaTime) // Tick에서 호출할거임
@@ -306,11 +332,31 @@ void Player::EndCrouch()
 
 void Player::TakeDamage(int damage)
 {
+	// 이미 무적 상태라면 데미지를 받지 않음
+	if (isInvincible)
+	{
+		return;
+	}
+
 	hp -= damage;
 
+	if (hp < 0)
+	{
+		hp = 0;
+	}
+
+	// 피격 직후 무적 상태 시작
+	isInvincible = true;
+
+	invincibleTimer = 0.0f;
+	blinkTimer = 0.0f;
+
+	
+
+	SetVisible(true);
 	if (hp <= 0)
 	{
-		QuitGame();
+		// GameOver();
 	}
 }
 

@@ -88,8 +88,21 @@ private:
 	float fireInterval = 0.2f;
 	Timer timer;
 
+	// 피격 무적 상태
 	bool isInvincible = false;
+	// 현재까지 지난 무적 시간
 	float invincibleTimer = 0.0f;
+
+	// 전체 무적 시간
 	float invincibleDuration = 1.0f;
+
+	// 깜빡임 시간 계산
+	float blinkTimer = 0.0f;
+
+	// 깜빡이는 간격
+	float blinkInterval = 0.1f;
+
+	// 현재 화면 표시 여부
+	bool isVisible = true;
 };
 

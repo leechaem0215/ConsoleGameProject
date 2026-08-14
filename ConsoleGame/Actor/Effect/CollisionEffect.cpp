@@ -18,7 +18,6 @@ CollisionEffect::CollisionEffect(
     effectKeys(keys)
 {
     sortingOrder = 20;
-
 }
 
 void CollisionEffect::Tick(float deltaTime)
@@ -33,7 +32,7 @@ void CollisionEffect::Tick(float deltaTime)
 
     frameTimer += deltaTime;
 
-    if (frameTimer < frameInterval)
+    if (frameTimer >= frameInterval)
     {
         return;
     }

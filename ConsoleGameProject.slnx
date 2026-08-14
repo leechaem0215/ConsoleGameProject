@@ -10,5 +10,7 @@
   <Project Path="../Unreal_Game_Track/ConsoleGameProject/CraftEngine/CraftEngine.vcxproj" Id="c93d6b4a-ce57-4761-b099-0349334ec87e">
     <Platform Project="x64" />
   </Project>
-  <Project Path="ConsoleGame/ConsoleGame.vcxproj" Id="40fe5f26-1121-4861-9ed6-958bc9f4a796" />
+  <Project Path="ConsoleGame/ConsoleGame.vcxproj" Id="40fe5f26-1121-4861-9ed6-958bc9f4a796">
+    <Build Solution="*|x86" Project="false" />
+  </Project>
 </Solution>

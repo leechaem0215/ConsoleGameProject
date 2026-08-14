@@ -28,5 +28,5 @@ private:
     int currentFrame = 0;
 
     float frameTimer = 0.0f;
-    float frameInterval = 0.06f;
+    float frameInterval = 0.5f;
 };
