@@ -1,7 +1,8 @@
-#include "Hazard.h"
+﻿#include "Hazard.h"
 #include "Actor/Player/Player.h"
 #include <Util/ResourceManager.h>
 #include <Engine/Engine.h>
+#include "Level/GameLevel.h"
 
 using namespace Craft;
 Hazard::Hazard(const std::wstring& imageKey, int groundY, HazardType type)
@@ -63,4 +64,55 @@ void Hazard::Tick(float deltaTime)
     {
         Destroy();
     }
+}
+
+int Hazard::GetCollisionLeft() const
+{
+    return GetPosition().x - collisionWidthPadding;
+}
+
+int Hazard::GetCollisionRight() const
+{
+    return GetPosition().x
+        + GetWidth()
+        + collisionWidthPadding;
+}
+
+void Hazard::MarkHitPlayer()
+{
+    hasHitPlayer = true;
+}
+
+void Hazard::AddAvoidScore()
+{
+    if (hasGivenScore)
+    {
+        return;
+    }
+
+    if (hasHitPlayer)
+    {
+        return;
+    }
+
+    // 일반 장애물과 천장 장애물만 회피 점수 지급
+    if (type != HazardType::Obstacle &&
+        type != HazardType::Ceiling)
+    {
+        return;
+    }
+
+    const std::shared_ptr<GameLevel> gameLevel =
+        std::dynamic_pointer_cast<GameLevel>(
+            GetOwner()
+        );
+
+    if (!gameLevel)
+    {
+        return;
+    }
+
+    hasGivenScore = true;
+
+    gameLevel->AddScore(100);
 }

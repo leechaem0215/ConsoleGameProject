@@ -17,14 +17,16 @@ class Enemy : public Craft::Actor
 	};
 public:
 	// 생성자도 위치가 필요, 어떤 문자열을 보여줄지도
-	Enemy(const std::wstring& image, int yPosition);
+	Enemy(const std::wstring& imageKey, int groundY);
+	virtual ~Enemy() = default;
 
+	void TakeDamage(int damage);
 private:
 	// 이벤트 함수 오버라이드
 	virtual void Tick(float deltaTime) override;
 
 	// 충돌 처리 함수 오버라이드
-	//virtual void OnCollision(const std::shared_ptr<Actor>& other) override;
+	virtual void OnCollision(const std::shared_ptr<Actor>& other) override;
 
 private:
 	// 이동 방향 열거형 변수
@@ -34,7 +36,10 @@ private:
 	// 좌우 이동 처리를 위한 변수
 	float xPosition = 0.0f;
 	float moveSpeed = 5.0f;
-
+	bool hasDamagedPlayer = false;
 	// 발사 타이머
 	Timer timer;
+
+	int hp = 1;
+	bool hasGivenKillScore = false;
 };

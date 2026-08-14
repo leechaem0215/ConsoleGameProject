@@ -11,11 +11,18 @@ public:
 	GameLevel(const GameResources& resources);
 	virtual ~GameLevel() = default;
 
+	void AddScore(int amount);
+	int GetScore() const;
+	int GetDifficultyLevel() const;
+	float GetHazardSpeedMultiplier() const;
 
 private:
 	virtual void OnInitialized() override;
 
 private:
 	GameResources resources;
+
+	int score = 0;
+	int scorePerSecond = 10;
 };
 

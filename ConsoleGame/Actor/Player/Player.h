@@ -9,7 +9,8 @@ class Player : public Craft::Actor
 	TYPE_DECLARATIONS(Player, Actor)
 
 public:
-	Player(const std::vector<std::wstring>& playerKeys);
+	Player(const std::vector<std::wstring>& playerKeys,
+		const std::vector<std::wstring>& effectKeys);
 	~Player() = default;
 
 public:
@@ -48,9 +49,12 @@ private:
 	void StartCrouch();
 	void EndCrouch();
 
+	void OnCollision(const std::shared_ptr<Actor>& other) override;
+
 	void Fire();
 private:
 	std::vector<std::wstring> playerKeys;
+	std::vector<std::wstring> effectKeys;
 
 	bool isCrouching = false;
 	int currentMoveFrame = 0;
@@ -78,7 +82,14 @@ private:
 	float gravity = 100.0f;
 	bool isJumping = false;
 	
+	int jumpCount = 0;
+	int maxJumpCount = 2;
+
 	float fireInterval = 0.2f;
 	Timer timer;
+
+	bool isInvincible = false;
+	float invincibleTimer = 0.0f;
+	float invincibleDuration = 1.0f;
 };
 

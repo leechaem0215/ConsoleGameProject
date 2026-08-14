@@ -4,6 +4,7 @@
 #include <Actor/Boundary.h>
 #include <Actor/Player/Player.h>
 #include <Actor/UI/PlayerHealthUI.h>
+#include <Actor/UI/ScoreUI.h>
 #include <Actor/Spawner/HazardSpawner.h>
 #include <Engine/Engine.h>
 
@@ -17,6 +18,38 @@ GameLevel::GameLevel(const GameResources& resources)
 	: resources(resources)
 {
 }
+
+void GameLevel::AddScore(int amount)
+{
+    if (amount <= 0)
+    {
+        return;
+    }
+
+    score += amount;
+}
+
+int GameLevel::GetScore() const
+{
+    return score;
+}
+
+int GameLevel::GetDifficultyLevel() const
+{
+    return score / 500;
+}
+
+float GameLevel::GetHazardSpeedMultiplier() const
+{
+    const float multiplier =
+        1.0f
+        + static_cast<float>(
+            GetDifficultyLevel()
+            ) * 0.1f;
+
+    return (std::min)(multiplier, 2.0f);
+}
+
 void GameLevel::OnInitialized()
 {
 	Level::OnInitialized();
@@ -26,11 +59,12 @@ void GameLevel::OnInitialized()
 
 	SpawnActor<Boundary>(Vector2::Zero,Engine::Get().GetWidth(),Engine::Get().GetHeight());
 
-	SpawnActor<Background>(resources.mapKeys);
+	//SpawnActor<Background>(resources.mapKeys);
 
 	SpawnActor<HazardSpawner>(resources.hazard);
 
-	std::shared_ptr<Player> player = SpawnActor<Player>(resources.playerKeys);
+	std::shared_ptr<Player> player = SpawnActor<Player>(resources.playerKeys, resources.effectKeys);
 
 	SpawnActor<PlayerHealthUI>(player);
+	SpawnActor<ScoreUI>();
 }

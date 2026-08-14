@@ -1,5 +1,6 @@
 ﻿#include "HazardSpawner.h"
 #include "Level/GameLayout.h"
+#include "Level/GameLevel.h"
 #include <Util/Util.h>
 #include <Actor/Hazard/Hazard.h>
 #include <Actor/Hazard/Enemy.h>
@@ -34,7 +35,40 @@ void HazardSpawner::Tick(float deltaTime)
 
 void HazardSpawner::ResetSpawnTimer()
 {
-    spawnTimer = static_cast<float>(Util::RandomRange(15, 30)) / 10.0f;
+    const std::shared_ptr<GameLevel> gameLevel =
+        std::dynamic_pointer_cast<GameLevel>(
+            GetOwner()
+        );
+
+    int difficultyLevel = 0;
+
+    if (gameLevel)
+    {
+        difficultyLevel =
+            gameLevel->GetDifficultyLevel();
+    }
+
+    // 기본 1.5초에서 난이도마다 0.1초 감소
+    const int minimumDelay =
+        (std::max)(
+            6,
+            15 - difficultyLevel
+            );
+
+    // 기본 3초에서 난이도마다 0.2초 감소
+    const int maximumDelay =
+        (std::max)(
+            10,
+            30 - difficultyLevel * 2
+            );
+
+    spawnTimer =
+        static_cast<float>(
+            Util::RandomRange(
+                minimumDelay,
+                maximumDelay
+            )
+            ) / 10.0f;
 }
 
 const std::wstring& HazardSpawner::SelectRandomKey(const std::vector<std::wstring>& keys) const
@@ -53,15 +87,11 @@ void HazardSpawner::SpawnRandomHazard()
         return;
     }
 
-    const int index = Util::RandomRange(0, 5);
-    const int spawnX = Engine::Get().GetWidth() + 2;
+    const int index = Util::RandomRange(0, 2);
 
     switch (index)
     {
     case 0:
-        break;
-
-    case 1:
         owner->SpawnActor<Hazard>(
             SelectRandomKey(resources.obstacleKeys),
             groundY,
@@ -69,14 +99,14 @@ void HazardSpawner::SpawnRandomHazard()
         );
         break;
 
-    case 2:
+    case 1:
         owner->SpawnActor<Enemy>(
             SelectRandomKey(resources.enemyKeys),
             groundY
         );
         break;
 
-    case 3:
+    case 2:
         owner->SpawnActor<Hazard> (
             SelectRandomKey(resources.ceilingKeys),
             ceilingY,

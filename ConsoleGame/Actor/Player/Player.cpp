@@ -1,13 +1,18 @@
 ﻿#include "Player.h"
 #include "Level/GameLayout.h"
+#include <Level/Level.h>
 #include <Engine/Engine.h>
 #include <Input/Input.h>
 #include <Actor/Player/PlayerBullet.h> 
+#include <Actor/Effect/CollisionEffect.h>
+#include <Actor/Hazard/Hazard.h>
 
 using namespace Craft;
-Player::Player(const std::vector<std::wstring>& playerKeys)
+Player::Player(const std::vector<std::wstring>& playerKeys,
+	const std::vector<std::wstring>& effectKeys)
 	: Actor(ResourceManager::GetText(L"Player"),Vector2::Zero,Color::Yellow),
-	playerKeys(playerKeys)
+	playerKeys(playerKeys),
+	effectKeys(effectKeys)
 {
 	ChangePlayerFrame(0);
 
@@ -113,10 +118,19 @@ void Player::Move(float direction, float deltaTime) // Tick에서 호출할거�
 
 void Player::Jump()
 {
-	if (isJumping)
+	// 엎드리면 점프 불가
+	if (isCrouching)
 	{
 		return;
 	}
+
+	// 이미 두 번 점프했다면 추가 점프 불가
+	if (jumpCount >= maxJumpCount)
+	{
+		return;
+	}
+
+	++jumpCount;
 	isJumping = true;
 	yVelocity = -jumpPower;
 	ChangePlayerFrame(5);
@@ -128,21 +142,19 @@ void Player::UpdateJump(float deltaTime)
 	{
 		return;
 	}
-
+	isJumping = true;
 	// 중력으로 인해 아래쪽 속도가 계속 증가
 	yVelocity += gravity * deltaTime;
 	// y에 적용
 	yPosition += yVelocity * deltaTime;
 
-	// 바닥 위치: 멤버 groundY 사용
-	const float gY = groundY;
-
 	// 바닥에 도착하거나 바닥을 통과했을 경우
-	if (yPosition >= gY)
+	if (yPosition >= groundY)
 	{
-		yPosition = gY;
+		yPosition = groundY;
 		yVelocity = 0.0f;
 		isJumping = false;
+		jumpCount = 0;
 	}
 
 	Vector2 newPosition = GetPosition();
@@ -156,11 +168,7 @@ void Player::UpdateMoveAnimation(
 	float direction)
 {
 	// 점프 중에는 PlayerJ 이미지 유지
-	if (isJumping)
-	{
-		return;
-	}
-	if (!isCrouching)
+	if (isJumping || isCrouching)
 	{
 		return;
 	}
@@ -245,14 +253,7 @@ void Player::ChangePlayerFrame(int frameIndex)
 
 void Player::StartCrouch()
 {
-	// 점프 중에는 엎드리지 않음
-	if (isJumping)
-	{
-		return;
-	}
-
-	// 이미 엎드린 상태면 다시 처리하지 않음
-	if (isCrouching)
+	if (isJumping || isCrouching)
 	{
 		return;
 	}
@@ -325,27 +326,82 @@ int Player::GetMaxHp() const
 
 
 void Player::Fire()
-{
-	// 탄약 생성 위치 구하기
-	// 플레이어의 가운데 위치
-	// <=A=>   < 위치 x에서 2칸 이동하면 A 위치가 됨.
-	//   ^   탄약이 제대로 가리키려면 해당 위치여야한다.
-	Vector2 bulletPosition(GetPosition().x + (GetWidth() / 2), GetPosition().y);
+ {
+	Vector2 bulletPosition(GetPosition().x + GetWidth(), GetPosition().y + (GetHeight() / 2));
 
 	// 탄약 생성
 	std::shared_ptr<Level> owner = GetOwner();
 	if (owner) {
-		//owner->SpawnActor<PlayerBullet>(bulletPosition);
+		owner->SpawnActor<PlayerBullet>(bulletPosition);
 	}
 }
+
 void Player::LandOn(int platformTop)
 {
-	Vector2 position = GetPosition();
+	const float landingY =static_cast<float>(platformTop - GetHeight());
 
-	position.y = platformTop - GetHeight();
+	yPosition = landingY;
+
+	Vector2 position = GetPosition();
+	position.y = static_cast<int>(landingY);
 
 	SetPosition(position);
 
 	yVelocity = 0.0f;
 	isJumping = false;
+	jumpCount = 0;
+}
+
+void Player::OnCollision(const std::shared_ptr<Actor>& other)
+{
+	super::OnCollision(other);
+
+	if (!other)
+	{
+		return;
+	}
+
+	std::shared_ptr<Hazard> hazard = std::dynamic_pointer_cast<Hazard>(other);
+
+	if (!hazard)
+	{
+		return;
+	}
+
+	// 충돌한 장애물은 점수X
+	hazard->MarkHitPlayer();
+
+	// 1. 장애물을 통과하지 않도록 위치 보정
+	const int knockbackDistance = 2; // 넉백 거리
+
+	Vector2 playerPosition = GetPosition();
+
+	playerPosition.x =hazard->GetPosition().x- GetWidth()- knockbackDistance;
+
+	playerPosition.x = (std::max)(0, playerPosition.x);
+
+	SetPosition(playerPosition);
+
+	xPosition = static_cast<float>(playerPosition.x);
+
+
+	// 2. 무적 중이면 데미지와 이펙트 생략
+	if (isInvincible)
+	{
+		return;
+	}
+	isInvincible = true;
+
+	// 3. 충돌 이펙트 생성
+	std::shared_ptr<Level> owner = GetOwner();
+
+	if (owner && !effectKeys.empty())
+	{
+		const Vector2 effectPosition(
+			playerPosition.x + GetWidth() - 2,
+			playerPosition.y + GetHeight() / 2
+		);
+
+		owner->SpawnActor<CollisionEffect>(effectPosition,effectKeys);
+	}
 }

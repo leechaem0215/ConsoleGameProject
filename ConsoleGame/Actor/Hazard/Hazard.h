@@ -21,7 +21,7 @@ public:
     virtual ~Hazard() = default;
 
     virtual void OnCollision( const std::shared_ptr<Craft::Actor>& other) override;
-
+    void MarkHitPlayer();
 private:
     virtual void Tick(float deltaTime) override;
 
@@ -30,4 +30,14 @@ private:
     float xPosition = 0.0f;
     float moveSpeed = 20.0f;
     bool hasDamagedPlayer = false;
+
+    bool hasHitPlayer = false;
+    bool hasGivenScore = false;
+protected:
+    int collisionWidthPadding = 2;
+    void AddAvoidScore();
+
+public:
+    int GetCollisionLeft() const;
+    int GetCollisionRight() const;
 };
