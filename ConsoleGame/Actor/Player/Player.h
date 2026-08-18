@@ -27,6 +27,7 @@ public:
 	void LandOn(int platformTop);
 
 	void TakeDamage(int damage);
+	void Heal(int amount);
 	int GetHp() const;
 	int GetMaxHp() const;
 

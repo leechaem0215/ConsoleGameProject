@@ -1,5 +1,7 @@
 ﻿#include "PlayerBullet.h"
 
+#include <Engine/Engine.h>
+
 using namespace Craft;
 PlayerBullet::PlayerBullet(const Vector2& position)
 	:Actor(L"o", position, Color::Yellow), //position 전달받은 위치값 사용
@@ -19,4 +21,9 @@ void PlayerBullet::Tick(float deltaTime)
 	Vector2 newPosition = GetPosition();
 	newPosition.x = static_cast<int>(xPosition);
 	SetPosition(newPosition);
+
+	if (xPosition >= Engine::Get().GetWidth())
+	{
+		Destroy();
+	}
 }

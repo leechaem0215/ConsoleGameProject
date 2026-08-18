@@ -32,11 +32,6 @@ Hazard::Hazard(const std::wstring& imageKey, int groundY, HazardType type)
 
 void Hazard::OnCollision(const std::shared_ptr<Craft::Actor>& other)
 {
-    if (hasDamagedPlayer)
-    {
-        return;
-    }
-
     std::shared_ptr<Player> player =
         std::dynamic_pointer_cast<Player>(other);
 
@@ -45,15 +40,21 @@ void Hazard::OnCollision(const std::shared_ptr<Craft::Actor>& other)
         return;
     }
 
+    MarkHitPlayer();
     player->TakeDamage(1);
-    hasDamagedPlayer = true;
 }
 
 void Hazard::Tick(float deltaTime)
 {
     super::Tick(deltaTime);
 
-    xPosition -= moveSpeed * deltaTime;
+    float speedMultiplier = 1.0f;
+    const std::shared_ptr<GameLevel> gameLevel = std::dynamic_pointer_cast<GameLevel>(GetOwner());
+    if (gameLevel)
+    {
+        speedMultiplier = gameLevel->GetHazardSpeedMultiplier();
+    }
+    xPosition -= moveSpeed * speedMultiplier * deltaTime;
 
     SetPosition(Vector2(
         static_cast<int>(xPosition),
@@ -62,6 +63,7 @@ void Hazard::Tick(float deltaTime)
 
     if (xPosition + GetWidth() < 0.0f)
     {
+        AddAvoidScore();
         Destroy();
     }
 }

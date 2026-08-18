@@ -50,6 +50,17 @@ float GameLevel::GetHazardSpeedMultiplier() const
     return (std::min)(multiplier, 2.0f);
 }
 
+void GameLevel::Tick(float deltaTime)
+{
+	Level::Tick(deltaTime);
+	scoreTimer += deltaTime;
+	while (scoreTimer >= 1.0f)
+	{
+		scoreTimer -= 1.0f;
+		AddScore(scorePerSecond);
+	}
+}
+
 void GameLevel::OnInitialized()
 {
 	Level::OnInitialized();

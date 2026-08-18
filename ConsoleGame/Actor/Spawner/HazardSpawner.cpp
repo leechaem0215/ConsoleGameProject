@@ -4,6 +4,7 @@
 #include <Util/Util.h>
 #include <Actor/Hazard/Hazard.h>
 #include <Actor/Hazard/Enemy.h>
+#include <Actor/Item/HeartItem.h>
 #include <Level/Level.h>
 #include <Engine/Engine.h>
 
@@ -84,6 +85,14 @@ void HazardSpawner::SpawnRandomHazard()
 
     if (owner == nullptr)
     {
+        return;
+    }
+
+    // 약 10% 확률로 회복 아이템을 생성한다.
+    const int roll = Util::RandomRange(0, 9);
+    if (roll == 0)
+    {
+        owner->SpawnActor<HeartItem>(groundY);
         return;
     }
 

@@ -29,8 +29,6 @@ private:
     HazardType type;
     float xPosition = 0.0f;
     float moveSpeed = 20.0f;
-    bool hasDamagedPlayer = false;
-
     bool hasHitPlayer = false;
     bool hasGivenScore = false;
 protected:

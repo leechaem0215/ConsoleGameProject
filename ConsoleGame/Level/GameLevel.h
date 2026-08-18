@@ -18,11 +18,13 @@ public:
 
 private:
 	virtual void OnInitialized() override;
+	virtual void Tick(float deltaTime) override;
 
 private:
 	GameResources resources;
 
 	int score = 0;
 	int scorePerSecond = 10;
+	float scoreTimer = 0.0f;
 };
 

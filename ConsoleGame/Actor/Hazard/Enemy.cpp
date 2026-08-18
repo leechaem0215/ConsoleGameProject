@@ -6,6 +6,7 @@
 #include <Util/ResourceManager.h>
 #include <Actor/Player/Player.h>
 #include <Level/GameLevel.h>
+
 using namespace Craft;
 Enemy::Enemy(const std::wstring& imageKey, int groundY)
 	:Actor(ResourceManager::GetText(imageKey),Vector2::Zero,Color::Red)
@@ -23,7 +24,9 @@ void Enemy::Tick(float deltaTime)
 {
 	super::Tick(deltaTime);
 
-	xPosition -= moveSpeed * deltaTime;
+	const std::shared_ptr<GameLevel> gameLevel = std::dynamic_pointer_cast<GameLevel>(GetOwner());
+	const float speedMultiplier = gameLevel ? gameLevel->GetHazardSpeedMultiplier() : 1.0f;
+	xPosition -= moveSpeed * speedMultiplier * deltaTime;
 
 	SetPosition(Vector2(
 		static_cast<int>(xPosition),
@@ -51,21 +54,23 @@ void Enemy::Tick(float deltaTime)
 
 void Enemy::OnCollision(const std::shared_ptr<Craft::Actor>& other)
 {
-	if (hasDamagedPlayer)
+	super::OnCollision(other);
+
+	// 충돌한 다른 액터가 플레이어 탄약이면 삭제
+	// 커스텀 타입 활용
+	if (other && other->IsTypeOf<PlayerBullet>())
 	{
+		other->Destroy();
+		TakeDamage(1);
 		return;
 	}
 
-	std::shared_ptr<Player> player =
-		std::dynamic_pointer_cast<Player>(other);
-
-	if (player == nullptr)
+	const std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(other);
+	if (player && !hasDamagedPlayer)
 	{
-		return;
+		player->TakeDamage(1);
+		hasDamagedPlayer = true;
 	}
-
-	player->TakeDamage(1);
-	hasDamagedPlayer = true;
 }
 
 void Enemy::TakeDamage(int damage)

@@ -6,6 +6,8 @@
 #include <Actor/Player/PlayerBullet.h> 
 #include <Actor/Effect/CollisionEffect.h>
 #include <Actor/Hazard/Hazard.h>
+#include <Game/Game.h>
+#include <Level/GameLevel.h>
 
 using namespace Craft;
 Player::Player(const std::vector<std::wstring>& playerKeys,
@@ -42,8 +44,11 @@ void Player::Tick(float deltaTime)
 
 	if (Input::Get().GetKeyDown(VK_ESCAPE))
 	{
-		QuitGame();
+		Game& game = dynamic_cast<Game&>(Engine::Get());
+		game.ToggleMenu();
+		return;
 	}
+	timer.Tick(deltaTime);
 
 	// 아래 방향키를 누르는 동안 엎드림
 	if (Input::Get().GetKey(VK_DOWN))
@@ -84,9 +89,10 @@ void Player::Tick(float deltaTime)
 	);
 
 	// 탄약 발사 로직
-	if (Input::Get().GetKeyDown(VK_SPACE))
+	if (Input::Get().GetKey(VK_SPACE) && timer.IsTimeOut())
 	{
 		Fire();
+		timer.Reset();
 	}
 
 	if (isInvincible)
@@ -356,13 +362,32 @@ void Player::TakeDamage(int damage)
 	SetVisible(true);
 	if (hp <= 0)
 	{
-		// GameOver();
+		int finalScore = 0;
+		const std::shared_ptr<GameLevel> gameLevel =
+			std::dynamic_pointer_cast<GameLevel>(GetOwner());
+		if (gameLevel)
+		{
+			finalScore = gameLevel->GetScore();
+		}
+
+		Game& game = dynamic_cast<Game&>(Engine::Get());
+		game.ShowGameOver(finalScore);
 	}
 }
 
 int Player::GetHp() const
 {
 	return hp;
+}
+
+void Player::Heal(int amount)
+{
+	if (amount <= 0 || hp <= 0)
+	{
+		return;
+	}
+
+	hp = (std::min)(maxHp, hp + amount);
 }
 
 int Player::GetMaxHp() const
@@ -436,7 +461,7 @@ void Player::OnCollision(const std::shared_ptr<Actor>& other)
 	{
 		return;
 	}
-	isInvincible = true;
+	TakeDamage(1);
 
 	// 3. 충돌 이펙트 생성
 	std::shared_ptr<Level> owner = GetOwner();
