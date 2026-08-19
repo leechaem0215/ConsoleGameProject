@@ -6,6 +6,7 @@
 #include <Util/ResourceManager.h>
 #include <Actor/Player/Player.h>
 #include <Level/GameLevel.h>
+#include <Util/TextCollision.h>
 
 using namespace Craft;
 Enemy::Enemy(const std::wstring& imageKey, int groundY)
@@ -66,7 +67,9 @@ void Enemy::OnCollision(const std::shared_ptr<Craft::Actor>& other)
 	}
 
 	const std::shared_ptr<Player> player = std::dynamic_pointer_cast<Player>(other);
-	if (player && !hasDamagedPlayer)
+	if (player
+		&& !hasDamagedPlayer
+		&& TextCollision::HasVisibleOverlap(*this, *player))
 	{
 		player->TakeDamage(1);
 		hasDamagedPlayer = true;

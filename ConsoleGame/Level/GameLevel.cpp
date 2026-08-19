@@ -45,9 +45,9 @@ float GameLevel::GetHazardSpeedMultiplier() const
         1.0f
         + static_cast<float>(
             GetDifficultyLevel()
-            ) * 0.1f;
+            ) * 0.15f;
 
-    return (std::min)(multiplier, 2.0f);
+    return (std::min)(multiplier, 2.5f);
 }
 
 void GameLevel::Tick(float deltaTime)

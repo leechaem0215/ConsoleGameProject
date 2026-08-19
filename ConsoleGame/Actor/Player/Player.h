@@ -75,10 +75,12 @@ private:
 	float groundY = 0.0f;
 
 	float moveSpeed = 20.0f;
+	int damageKnockbackDistance = 3;
 
 	// 점프 관련 변수
 	/* Y축 속도 + 중력 + 착지 판정 */
 	float yVelocity = 0.0f;
+	// 1단 점프와 2단 점프에 동일한 점프력을 적용한다.
 	float jumpPower = 25.0f;
 	float gravity = 100.0f;
 	bool isJumping = false;

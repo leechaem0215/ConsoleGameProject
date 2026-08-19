@@ -8,6 +8,7 @@
 #include <Actor/Hazard/Hazard.h>
 #include <Game/Game.h>
 #include <Level/GameLevel.h>
+#include <Util/TextCollision.h>
 
 using namespace Craft;
 Player::Player(const std::vector<std::wstring>& playerKeys,
@@ -344,6 +345,16 @@ void Player::TakeDamage(int damage)
 		return;
 	}
 
+	// 최초 피격 시에만 플레이어를 왼쪽으로 짧게 밀어낸다.
+	xPosition = (std::max)(
+		0.0f,
+		xPosition - static_cast<float>(damageKnockbackDistance)
+	);
+
+	Vector2 knockbackPosition = GetPosition();
+	knockbackPosition.x = static_cast<int>(xPosition);
+	SetPosition(knockbackPosition);
+
 	hp -= damage;
 
 	if (hp < 0)
@@ -439,31 +450,25 @@ void Player::OnCollision(const std::shared_ptr<Actor>& other)
 		return;
 	}
 
+	if (!TextCollision::HasVisibleOverlap(*this, *hazard))
+	{
+		return;
+	}
+
 	// 충돌한 장애물은 점수X
 	hazard->MarkHitPlayer();
 
-	// 1. 장애물을 통과하지 않도록 위치 보정
-	const int knockbackDistance = 2; // 넉백 거리
-
+	// 충돌 시 위치를 강제로 변경하지 않고 현재 위치에서 피격 처리한다.
 	Vector2 playerPosition = GetPosition();
 
-	playerPosition.x =hazard->GetPosition().x- GetWidth()- knockbackDistance;
-
-	playerPosition.x = (std::max)(0, playerPosition.x);
-
-	SetPosition(playerPosition);
-
-	xPosition = static_cast<float>(playerPosition.x);
-
-
-	// 2. 무적 중이면 데미지와 이펙트 생략
+	// 무적 중이면 데미지와 이펙트 생략
 	if (isInvincible)
 	{
 		return;
 	}
 	TakeDamage(1);
 
-	// 3. 충돌 이펙트 생성
+	// 충돌 이펙트 생성
 	std::shared_ptr<Level> owner = GetOwner();
 
 	if (owner && !effectKeys.empty())

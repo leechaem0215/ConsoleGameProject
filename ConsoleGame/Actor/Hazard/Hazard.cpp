@@ -3,6 +3,7 @@
 #include <Util/ResourceManager.h>
 #include <Engine/Engine.h>
 #include "Level/GameLevel.h"
+#include <Util/TextCollision.h>
 
 using namespace Craft;
 Hazard::Hazard(const std::wstring& imageKey, int groundY, HazardType type)
@@ -36,6 +37,11 @@ void Hazard::OnCollision(const std::shared_ptr<Craft::Actor>& other)
         std::dynamic_pointer_cast<Player>(other);
 
     if (player == nullptr)
+    {
+        return;
+    }
+
+    if (!TextCollision::HasVisibleOverlap(*this, *player))
     {
         return;
     }
