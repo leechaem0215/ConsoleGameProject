@@ -2,6 +2,9 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
-  <Project Path="Array/Array.vcxproj" />
-  <Project Path="List/List.vcxproj" />
+  <Project Path="Array/Array.vcxproj" Id="926b9f8d-cfb6-4c46-89a2-105065bd6c84" />
+  <Project Path="List/List.vcxproj" Id="297a7ca4-6119-44f6-bdd6-0a987ed581c5" />
+  <Project Path="SingleLinkedList/SingleLinkedList.vcxproj" Id="a7e7f677-2163-47c8-bf43-547a9929b189" />
+  <Project Path="Stack/Stack.vcxproj" Id="7e00b498-cd87-4e58-8b4f-b35612cee642" />
+  <Project Path="StackMaze/StackMaze.vcxproj" Id="d41c0307-70f0-46f3-9445-f4944d1c99fd" />
 </Solution>

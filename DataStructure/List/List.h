@@ -3,6 +3,15 @@
 #include <cassert>
 #include <iostream>
 
+// 리스트 이터레이터
+
+
+
+// 편의 목적을 위해 타입 재정의
+
+
+
+
 // 템플릿 동적 배열 클래스
 // 템플릿은 header에만 구현 << cpp 로 구분해서 구현하지 않음
 // 템플릿은 추론 (해석) 시점이 컴파일 시간이기 때문
@@ -43,7 +52,7 @@ public:
 
 	// 복사 대입 연산자 오버로딩
 	// 리스트 레퍼런스 반환하도록 할거임
-	List& operator = (const List& other)
+	List& operator= (const List& other)
 	{
 		// 예외처리 (같은 객체인지 확인)
 		if (this == &other)
@@ -194,6 +203,7 @@ public:
 
 	// 범위 기반 루프 사용 가능하도록 추가
 	T* begin() const { return data; }
+	T* end() const { return data + size; }
 
 private:
 	// 재할당 메소드

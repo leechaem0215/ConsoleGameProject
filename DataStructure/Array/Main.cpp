@@ -51,11 +51,18 @@ private:
 int main() 
 {
 	// 배열객체 생성
+	std::array<int, 20> stdArray;
 	Array<int, 5> intArray; // 템플릿으로 10을 넘겨줌
+	//std::fill(
+	//	intArray.Data(),
+	//	intArray.Data() + intArray.Length(),
+	//	20
+	//);
+
 	std::fill(
-		intArray.Data(),
-		intArray.Data() + intArray.Length(),
-		20
+		intArray.begin(),
+		intArray.end(),
+		100
 	);
 
 	// 범위 기반 루프
@@ -69,9 +76,6 @@ int main()
 	//int intNumber = intArray[0];
 	//const int& constNumber = intArray[0]; // 상수 참조로 받음 // const 레퍼런스 처리도 가능
 
-
-
-
 	// 정적 배열
 	const uint32_t size = 5; // 상수로 해주어야함
 	int array[5] = {}; // 초기화
@@ -79,13 +83,6 @@ int main()
 	array[1] = 20;
 
 	int number = array[0];
-
-	std::fill(
-		intArray.begin(),
-		intArray.end(),
-		100
-	)
-		
 
 	// 동적 배열 (힙에 할당되는 배열)
 	uint32_t dSize = 10;
