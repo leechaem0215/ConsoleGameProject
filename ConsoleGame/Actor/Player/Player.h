@@ -26,7 +26,8 @@ public:
 
 	void LandOn(int platformTop);
 
-	void TakeDamage(int damage);
+	// 실제로 피해가 적용됐을 때 true를 반환한다.
+	bool TakeDamage(int damage);
 	void Heal(int amount);
 	int GetHp() const;
 	int GetMaxHp() const;

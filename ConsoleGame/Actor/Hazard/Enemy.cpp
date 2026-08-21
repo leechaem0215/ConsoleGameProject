@@ -71,8 +71,8 @@ void Enemy::OnCollision(const std::shared_ptr<Craft::Actor>& other)
 		&& !hasDamagedPlayer
 		&& TextCollision::HasVisibleOverlap(*this, *player))
 	{
-		player->TakeDamage(1);
-		hasDamagedPlayer = true;
+		// 무적 상태라 피해가 적용되지 않았다면 다음 충돌에서 다시 시도한다.
+		hasDamagedPlayer = player->TakeDamage(1);
 	}
 }
 

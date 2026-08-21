@@ -337,12 +337,12 @@ void Player::EndCrouch()
 	SetPosition(position);
 }
 
-void Player::TakeDamage(int damage)
+bool Player::TakeDamage(int damage)
 {
 	// 이미 무적 상태라면 데미지를 받지 않음
-	if (isInvincible)
+	if (isInvincible || damage <= 0 || hp <= 0)
 	{
-		return;
+		return false;
 	}
 
 	// 최초 피격 시에만 플레이어를 왼쪽으로 짧게 밀어낸다.
@@ -384,6 +384,8 @@ void Player::TakeDamage(int damage)
 		Game& game = dynamic_cast<Game&>(Engine::Get());
 		game.ShowGameOver(finalScore);
 	}
+
+	return true;
 }
 
 int Player::GetHp() const
